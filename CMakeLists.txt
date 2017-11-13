@@ -2,8 +2,10 @@ cmake_minimum_required(VERSION 2.8)
 project(DBoW2)
 include(ExternalProject)
 
-option(BUILD_DBoW2   "Build DBoW2"            ON)
-option(BUILD_Demo    "Build demo application" ON)
+option(BUILD_DBoW2   "Build DBoW2"                   ON)
+option(BUILD_Demo    "Build demo application"        ON)
+option(BUILD_Brisk_Demo "Build demo using Brisk"     ON)
+option(BUILD_Brisk_Test "Build unit tests for Brisk" ON)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
@@ -25,10 +27,11 @@ set(HDRS
   include/DBoW2/BowVector.h           include/DBoW2/FBrief.h
   include/DBoW2/QueryResults.h        include/DBoW2/TemplatedDatabase.h   include/DBoW2/FORB.h
   include/DBoW2/DBoW2.h               include/DBoW2/FClass.h              include/DBoW2/FeatureVector.h
-  include/DBoW2/ScoringObject.h       include/DBoW2/TemplatedVocabulary.h)
+  include/DBoW2/ScoringObject.h       include/DBoW2/TemplatedVocabulary.h include/DBoW2/FBrisk.h)
 set(SRCS 
   src/BowVector.cpp     src/FBrief.cpp        src/FORB.cpp
-  src/FeatureVector.cpp src/QueryResults.cpp  src/ScoringObject.cpp)
+  src/FeatureVector.cpp src/QueryResults.cpp  src/ScoringObject.cpp 
+  src/FBrisk.cpp)
 
 set(DEPENDENCY_DIR ${CMAKE_CURRENT_BINARY_DIR}/dependencies)
 set(DEPENDENCY_INSTALL_DIR ${DEPENDENCY_DIR}/install)
@@ -70,9 +73,24 @@ endif(BUILD_DBoW2)
 
 if(BUILD_Demo)
   add_executable(demo demo/demo.cpp)
+  message("DLib_LIBS: ${DLib_LIBS}")
   target_link_libraries(demo ${PROJECT_NAME} ${OpenCV_LIBS} ${DLib_LIBS})
   file(COPY demo/images DESTINATION ${CMAKE_BINARY_DIR}/)
 endif(BUILD_Demo)
+
+if(BUILD_Brisk_Demo)
+  add_executable(brisk-demo demo/brisk-demo.cpp)
+  message("DLib_LIBS: ${DLib_LIBS}")
+  target_link_libraries(brisk-demo ${PROJECT_NAME} ${OpenCV_LIBS} ${DLib_LIBS})
+  file(COPY demo/images DESTINATION ${CMAKE_BINARY_DIR}/)
+endif(BUILD_Brisk_Demo)
+
+if(BUILD_Brisk_Test)
+  add_executable(brisk-test demo/brisk-test.cpp)
+  message("DLib_LIBS: ${DLib_LIBS}")
+  target_link_libraries(brisk-test ${PROJECT_NAME} ${OpenCV_LIBS} ${DLib_LIBS})
+  file(COPY demo/images DESTINATION ${CMAKE_BINARY_DIR}/)
+endif(BUILD_Brisk_Test)
 
 configure_file(src/DBoW2.cmake.in
   "${PROJECT_BINARY_DIR}/DBoW2Config.cmake" @ONLY)
